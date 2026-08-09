@@ -2,8 +2,17 @@
 __pycache__/
 *.pyc
 *.sqlite3
-.env
+
+# Virtual environment
 .venv/
+venv/
+
+# Environment variables
+.env
+.env.*
+
+# Keep example environment files
+!.env.example
 
 # Node
 node_modules/
@@ -18,3 +27,15 @@ dist/
 
 # Logs
 *.log
+
+
+# Django
+staticfiles/
+media/
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
