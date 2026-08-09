@@ -18,6 +18,8 @@ services:
           context: ./backend
         container_name: taskhub_backend
         restart: unless-stopped
+        env_file:
+          - .env
         command: python manage.py runserver 0.0.0.0:8000
         volumes:
           - ./backend/src:/app
