@@ -40,3 +40,11 @@ export const getMe = async (): Promise<User> => {
 
     return response.data;
 };
+
+export async function refreshToken(refresh: string) {
+    const response = await apiClient.post("/auth/refresh/", {
+        refresh: refresh,
+    });
+
+    return response.data;
+}

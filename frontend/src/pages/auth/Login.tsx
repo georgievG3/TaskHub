@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { login } from "../../services/authServices";
+import LogoutButton from "../../components/LogoutButton";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { loginUser } = useContext(AuthContext);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -11,8 +15,9 @@ export default function Login() {
         try {
             const tokens = await login(email, password);
 
-            localStorage.setItem("access", tokens.access);
-            localStorage.setItem("refresh", tokens.refresh);
+            console.log("LOGIN SUCCESS - calling loginUser");
+
+            await loginUser(tokens.access, tokens.refresh);
 
         } catch (error) {
             console.error(error);
@@ -38,6 +43,7 @@ export default function Login() {
             />
 
             <button type="submit">Login</button>
+            <LogoutButton />
         </form>
     );
 }
