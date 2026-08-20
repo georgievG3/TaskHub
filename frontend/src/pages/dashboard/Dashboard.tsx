@@ -14,6 +14,7 @@ export default function Dashboard() {
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [status, setStatus] = useState<Task["status"]>("todo");
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
     useEffect(() => {
         getTasks()
@@ -48,6 +49,53 @@ export default function Dashboard() {
         } catch (error) {
             console.error("Failed to create task:", error);
         }
+    };
+
+    const handleEditTask = (task: Task) => {
+        setEditingTaskId(task.id);
+        setTitle(task.title);
+        setDescription(task.description);
+        setDueDate(task.due_date);
+        setStatus(task.status);
+    };
+
+    const handleSaveTask = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if(editingTaskId === null) {
+            return;
+        };
+
+        try{
+            const updatedTask = await updateTask(editingTaskId, {
+                title,
+                description,
+                due_date: dueDate,
+                status,
+            });
+
+            setTasks((currentTasks) =>
+                currentTasks.map((task) =>
+                    task.id === editingTaskId ? updatedTask : task
+                )
+            );
+
+            setEditingTaskId(null);
+            setTitle("");
+            setDescription("");
+            setDueDate("");
+            setStatus("todo");
+        } catch (error) {
+            console.error("Failed to update task:", error);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingTaskId(null);
+        setTitle("");
+        setDescription("");
+        setDueDate("");
+        setStatus("todo");
     };
 
     const handleUpdateTask = async (id: number) => {
@@ -86,8 +134,8 @@ export default function Dashboard() {
         <div>
             <h1>Dashboard</h1>
 
-            <form onSubmit={handleCreateTask}>
-                <h2>Create Task</h2>
+            <form onSubmit={editingTaskId === null ? handleCreateTask : handleSaveTask}>
+                <h2>{editingTaskId === null ? "Create Task" : "Edit Task"}</h2>
 
                 <input
                     type="text"
@@ -120,8 +168,14 @@ export default function Dashboard() {
                 </select>
 
                 <button type="submit">
-                    Create Task
+                    {editingTaskId === null ? "Create Task" : "Save Changes"}
                 </button>
+
+                {editingTaskId !== null && (
+                    <button type="button" onClick={handleCancelEdit}>
+                        Cancel
+                    </button>
+                )}
             </form>
 
             <h2>My Tasks</h2>
@@ -135,6 +189,10 @@ export default function Dashboard() {
                             <strong>{task.title}</strong>
                             {" - "}
                             {task.status}
+
+                            <button onClick={() => handleEditTask(task)}>
+                                Edit
+                            </button>
 
                             {task.status !== "done" && (
                                 <button onClick={() => handleUpdateTask(task.id)}>
